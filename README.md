@@ -1,0 +1,4 @@
+
+Using:
+- Obsidian
+- Excalidraw extesion
