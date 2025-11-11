@@ -65,4 +65,6 @@ Nella manipolazione dei messaggi vengono sostituiti i frame e le intestazioni de
 
 ## Architettura TCP/IP
 
-Lorem Ipsum
+![[TCP-IP.excalidraw|1000]]
+
+TODO: Pagina 14

@@ -20,18 +20,6 @@
               "icon": "lucide-file",
               "title": "Lezione 1"
             }
-          },
-          {
-            "id": "2f39559305988c3e",
-            "type": "leaf",
-            "state": {
-              "type": "excalidraw",
-              "state": {
-                "file": "Images/Architettura_ISO_OSI.excalidraw.md"
-              },
-              "icon": "excalidraw-icon",
-              "title": "Architettura_ISO_OSI.excalidraw"
-            }
           }
         ]
       }
@@ -90,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "840d5809051e0eb8",
@@ -196,13 +185,14 @@
   },
   "active": "275ff92ed3b89a1f",
   "lastOpenFiles": [
-    "Images/Router.excalidraw.md",
-    "Images/Bridge.excalidraw.md",
-    "Templates/Template.excalidraw.md",
-    "Lezioni/Lezione 1.md",
-    "Images/Repeater.excalidraw.md",
-    "Images/Proxy.excalidraw.md",
+    "Images/TCP-IP.excalidraw.md",
     "Images/Architettura_ISO_OSI.excalidraw.md",
+    "Lezioni/Lezione 1.md",
+    "Images/Bridge.excalidraw.md",
+    "Images/Router.excalidraw.md",
+    "Images/Proxy.excalidraw.md",
+    "Images/Repeater.excalidraw.md",
+    "Templates/Template.excalidraw.md",
     "Images/Drawing 2025-11-11 15.36.25.excalidraw.md",
     "Lezioni",
     "Templates",
