@@ -115,8 +115,8 @@ La _performance_ di una rete viene misurata attraverso:
 
 Le onde sinusoidali sono composte da:
 - Ampiezza ($A$), viene solitamente espressa in Volt e influenza quando l'onda è alta;
-- Frequenza ($f$), espressa in Hertz (1/s) rappresenta quanto velocemente l'onda oscilla / si ripete;
-- Fase ($\varphi$) quanto l'onda è spostata verso destra/sinistra.
+- Frequenza ($f$), espressa in Hertz (1/s), rappresenta quanto velocemente l'onda oscilla / si ripete;
+- Fase ($\varphi$), quanto l'onda è spostata verso destra/sinistra.
 
 La frequenza può essere scritta anche come l'inversa del tempo, $T = \frac1f$.
 
@@ -194,5 +194,4 @@ Per immagazzinare i dati si utilizzano i buffer, però, se viene esaurito lo spa
 
 In una connessione si preferisce quindi che la varianza sia poca in modo che non si debbano avere buffer troppo grandi.
 
----
 [^1]: La commutazione di pacchetto è una tecnica di accesso multiplo a divisione di tempo utilizzata per condividere un canale di comunicazione tra più nodi in modo non deterministico, suddividendo l'informazione da trasferire in pacchetti trasmessi individualmente e in sequenza.
