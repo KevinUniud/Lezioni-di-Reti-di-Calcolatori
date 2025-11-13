@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Lezioni/Lezione 1 - 14 Novembre 2025.md",
+                "file": "README.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Lezione 1 - 14 Novembre 2025"
+              "title": "README"
             }
           }
         ],
@@ -199,8 +199,8 @@
   },
   "active": "b86d10cd29454181",
   "lastOpenFiles": [
-    "Lezioni/temp.md",
     "Lezioni/Lezione 1 - 14 Novembre 2025.md",
+    "Lezioni/temp.md",
     "Images/Lezione 1/4B5B.excalidraw.md",
     "Images/Lezione 1/Manchester.excalidraw.md",
     "Images/Lezione 1/MLT-3excalidraw.md",
