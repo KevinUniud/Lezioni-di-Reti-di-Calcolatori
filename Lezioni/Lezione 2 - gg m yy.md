@@ -194,11 +194,82 @@ Un protocollo che sfrutta meglio la capacità del canale è lo _sliding window_,
 
 Questo protocollo è una generalizzazione dello stop-and-wait che consente di mandare più messaggi durante lo stesso RTT in modo da riempire il canale. Dato che si hanno più messaggi non basterà più solo un bit per riconoscere i frame e si dovrà aggiungere un numero di frequenza.
 
+#### Mittente
 
+- _Sending Window Size (SWS)_: Dimensione della finestra, rappresenta il numero massimo di frame inviati e di cui si sta aspettando un riscontro;
+- _Last Frame Sent (LFS)_: Numero dell'ultimo frame inviato;
+- _Last Acknowledgement Received (LAR)_: Numero dell'ultimo frame di cui si ha riscontro.
 
+Avendo un buffer di dati da spedire ed un massimo di dati che possono essere spediti ed in attesa di riscontro, man mano che il mittente invia i frame incrementa il numero di LFS, mentre quando riceve aumenta il numero di LAR.
 
-**Problemi con questo protocollo**:
+La finestra viene shiftata quando il mittente viene notificato tramite ACK della corretta ricezione.
+
+> [!warning]
+> La differenza tra LFS e LAR non deve mai superare il SWS, se il limite viene raggiunto di deve aspettare che il LAR aumenti.
+
+Si supponga di essere nel caso in cui si sono esauriti i numeri di invii possibili e non arriva nessun riscontro, il mittente legge il numero di ACK e si accorgo che non è arrivato il primo, procede quindi al re-invio del primo frame (con lo stesso numero). Il destinatario vedendo arrivare un frame già ricevuto lo scarta e invia l'ACK corrispondente per dare riscontro. Lo stesso accade in caso di timeout.
+
+#### Ricevitore
+
+- _Receiving Windows Size (RWS)_: Numero massimo di frame che si possono accettare;
+- _Last Acceptable Frame (LAF)_: Numero dell'ultimo frame accettato;
+- _Last Frame Received (LFR)_: Numero dell'ultimo frame ricevuto in ordine.
+
+La differenza $LAF - LFR$ rappresenta lo spazio di frame ancora accettabili e si ha ancora il vincolo di non superare la dimensione della finestra.
+
+Quando il destinatario riceve un pacchetto controlla il numero di sequenza, se è compreso tra LFR e LAF lo accetta altrimenti viene scartato.
+
+Si può usare un ACK cumulativo in qui si tiene in memoria il numero di ACK corretti e tenendo il mittente a corrente del numero se un pacchetto non dovesse arrivare il ricevitore ferma la comunicazione mandando in timeout il mittente che procede così con il re-invio dei pacchetti mancanti.
+
+> [!example]
+> LFR = 5
+> RWS = 4
+> LAF = 9
+> Se arrivassero i frame 7 e 8 verrebbero bufferizzati poiché all'interno della finestra, però, non verrebbe inviato nessun ACK poiché il frame 6 deve ancora arrivare.
+> Una volta arrivato il frame 6, dopo un timeout del mittente, il ricevitore riconosce i frame 7 e 8, porta LFR a 8 e sposta il LAF a 12.
+
+#### Problemi
+
+Il mittente e destinatario devono tenere conto dello stato dei pacchetti e rimanere sempre dentro alla dimensione della finestra, inoltre, i counter vengono aumentati solo quando ricevono gli ACK.
+
+Questo sistema ha perdite di efficienza poiché bisogna aspettare gli ACK, possono esserci dei timeout, ci sono dei re-invii in caso di errori o scarti.
+
+Per migliorare la situazione si possono utilizzare diversi ACK:
+- _Negative Acknowledgement (NAK)_: All'arrivo di un nuovo frame se non è arrivato l'ACK per il precedente di invia un NAK;
+- _Additional Acknowledgement_: All'arrivo di un nuovo frame si invia l'ultimo ACK ricevuto (metodo utilizzato in TCP);
+- _Selective Acknowledgement_: Il ricevitore tutti i frame, può quindi chiedere quelli mancanti pur continuando ad accettare gli altri.
+
+Il counter di sequenza dei frame è di lunghezza fissa, si deve quindi effettuare un _wrap_ e re-iniziare il counter quando si è arrivati alla fine ma se il buffer è di grandezza elevata si rischia che dei frame abbiano lo stesso numero di sequenza.
+
+Si può impostare un numero di sequenza maggiore di quello dei frame inviabili, nello sliding window è impostato come $2^n -1$, SWS deve quindi esserne più piccolo, questo però potrebbe non bastare. Per evitare problemi si usa $SWS \leq \frac{(maxSeqNum + 1)}{2} = 2^{n-1}$, in questo modo solo metà sequenza può essere usata per la trasmissione.
 
 ## Ethernet - IEEE 802.3
 
+L'802.3 è lo standard Ethernet per la comunicazione e garantisce la retro-compatibilità.
+
+Viene usato nel livello 1 e 2 dello stack OSI e definisce come vengono modulati i segnali, il tipo di mezzo fisico ed il protocollo di accesso al mezzo (composizione frame, codifica, gestione errori).
+
+Il protocollo di accesso al mezzo è chiamato CSMA/CD (_Carrier Sense Multiple Access with Collision Detection_) e consente di regolare l'accesso al mezzo.
+
+- _Carrier_: Tutti i nodi possono distinguere un collegamento inattivo (_idle_) da uno occupato (_busy_);
+- _Multiple access_: Ogni nodo può accedere al collegamento e provare a inviare in tempi casuali;
+- _Collision detection_: Ogni nodo che trasmette è anche in ascolto per essere in grado di rilevare se vi siano state delle collisioni nel canale.
+
 ### 10 base 5
+
+Offre una trasmissione a 10 Mbps su cavo da 500 m a cui si possono collegare fino a 100 host per segmento di cavo.
+
+Per la trasmissione fisica si usa un cavo coassiale in cui alle estremità sono presenti dei terminali (resistori da 50 $\Omega$). Per accedervi, ogni stazione si collega sulla linea sfruttando un _vampire tap_ che effettua un buco sul cavo e vi si connette tramite due pin, uno appoggiato alla maglia del cavo e uno collegato ai fili interni.
+
+Gli host comunicano tramite _transceiver_, un dispositivo che invia un segnale quando l'host trasmette e che può rilevare quando la linea è inattiva. Al suo interno si effettuano la creazione e scompattazione dei frame, la loro trasmissione, il riconoscimento di collisioni ed il re-invio dei dati.
+
+Dal punto di vista elettrico si hanno dei segnali modulati che si propagano lungo il cavo in entrambe le direzioni con una velocità di $\frac{2c}3$ e frequenza di 10 MHz. 
+
+Si utilizza la codifica Manchester invertita con valori da $\pm 0.85$ V e la fine della trasmissione è riconosciuta dalla mancanza di _carrier_. 
+
+Si possono collegare altri segmenti tra di loro tramite dei _repeater_[^1] purché non ci siano loop o più di 4 ripetitori tra due host. Una disposizione tipica prevede un segmento che colleghi solo dei ripetitori, questo viene chiamato _backbone_, tutte le stazioni si troveranno poi sugli altri segmenti.
+
+
+
+
+[^1]: ![[Lezione 1 - 14 Novembre 2025#Repeater]]
