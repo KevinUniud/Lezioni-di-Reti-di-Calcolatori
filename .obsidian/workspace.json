@@ -8,7 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "a3ceea38cc749fbf",
+            "id": "ec373e36f18d4a9f",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -20,11 +20,23 @@
               "icon": "lucide-file",
               "title": "Lezione 3 - gg m yy"
             }
+          },
+          {
+            "id": "241e4c630f9f7e38",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Images/Lezione 3/OFDM.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "OFDM.excalidraw"
+            }
           }
         ]
       },
       {
-        "id": "63fdc3f9cef3e6b7",
+        "id": "2b975916fdb9443a",
         "type": "tabs",
         "children": [
           {
@@ -201,10 +213,12 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "a3ceea38cc749fbf",
+  "active": "ec373e36f18d4a9f",
   "lastOpenFiles": [
     "appunti.pdf",
     "Lezioni/Lezione 3 - gg m yy.md",
+    "Images/Lezione 3/OFDM.excalidraw.md",
+    "Images/Lezione 3/Standard WIFI.excalidraw.md",
     "Images/Lezione 3/Pacchetto ethernet.excalidraw.md",
     "Lezioni/Lezione 1 - 14 Novembre 2025.md",
     "Lezioni/Lezione 4 - gg m yy.md",
@@ -228,8 +242,6 @@
     "Images/Lezione 1/4B5B.excalidraw.md",
     "Images/Lezione 1/Manchester.excalidraw.md",
     "Images/Lezione 1/Wavelenght.excalidraw.md",
-    "Images/Lezione 1/Sinusoide.excalidraw.md",
-    "Images/Lezione 1/Bandwidth.excalidraw.md",
     "Images/Lezione 2",
     "Images/Lezione 1",
     "Lezioni",

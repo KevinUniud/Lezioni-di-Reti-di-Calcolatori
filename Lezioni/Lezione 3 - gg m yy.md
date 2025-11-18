@@ -135,15 +135,77 @@ $$
 
 ### Spread Spectrum
 
+La tecnica spread Spectrum è utilizzata per il Bluetooth e serve a diminuire le interferenze dei segnali ma non garantisce la segretezza dei dati.
+
 **Spread Spectrum con salto di frequenza**:
+
+Il segnale viene trasmesso su una sequenza casuale di frequenze. Il ricevitore utilizza lo stesso algoritmo del mittente che viene inizializzato con lo stesso _seed_, questo permette ad entrambi di rimanere sincronizzati sulle stesse frequenze ad ogni salto.
+
+La trasmissione viene quindi sparpagliata su più canali di frequenze e i salti tra di essi vengono regolati da: una sequenza di _hopping_ ed intervalli di tempo.
+
+I numeri di sequenza dei canali e gli intervalli di tempo vengono decisi all'inizio della comunicazione.
+
+La probabilità di trovarsi nella stessa frequenza ed ampiezza di un altra coppia di dispositivi è molto bassa.
+
+Il _dwell time_ è l'intervallo di tempo di utilizzo di una certa frequenza e l'_hop time_ è il tempo di sintonizzazione da un segnale all'altro, questo crea anche un calo di efficienza in quanto la trasmissione si deve interrompere momentaneamente per cambiare frequenza e risintonizzarsi.
 
 **Spread Spectrum a sequenza diretta**:
 
+Per ogni bit che il mittente vuole trasmettere si invia lo `XOR` di quel bit e di $n$ bit casuali chiamati _sequenza di chipping_, questi sono generati da un generatore noto sia a mittente che destinatario e pertanto basta rieseguire lo `XOR` tra la sequenza ricevuta e quella di chipping per riottenere i valori iniziali.
+
+Dato che la sequenza casuale è più lunga dei bit che si vogliono trasmettere si deve introdurre un meccanismo che espanda i bit e uno che li comprima.
+
+I valori trasmessi sono noti come _codice di chipping a n bit_ e diffondono il segnale su una banda di frequenze $n$ volte più ampia.
+
 ### Diverse tecnologie wireless
+
+|                             |        Bluetooth (802.15.1)        |           Wi-Fi (802.11)           |                Cellular                 |
+| :-------------------------: | :--------------------------------: | :--------------------------------: | :-------------------------------------: |
+|     Typical link length     |                10 m                |               100 m                |           Tens of kilometers            |
+|      Typical data rate      |          2 Mbps (shared)           |          54 Mbps (shared)          |  Hundreds of kbps<br>(per connection)   |
+|         Typical use         | Link a peripheral<br>to a computer | Link a computer<br>to a wired base | Link a mobile phone<br>to a wired tower |
+| Wired technology<br>analogy |                USB                 |              Ethernet              |                   DSL                   |
+
+Solitamente le comunicazioni sono di tipo punto-punto o punto-multipunto e la comunicazione tra nodi _client_ può essere diretta o instradata attraverso la stazione base (telefoni e Bluetooth)[^4].
+
+Le connessioni wireless supportano la mobilità dei nodi e vengono forniti tre livelli di mobilità per i client:
+- Nessuna mobilità, il ricevitore deve trovarsi in una posizione fissa per ricevere una trasmissione direzionale dalla stazione base;
+- Mobilità all'interno del raggio d'azione di una base (Bluetooth);
+- Mobilità tra basi (Telefoni e Wi-Fi).
+
+Un'alternativa alle reti asimmetriche sono le _mesh network_ o _ad-hoc network_ in cui i nodi sono _peer_ e i messaggi possono essere inoltrati attraverso una catena di essi.
 
 ## WIFI - IEEE 802.11
 
+Comunemente chiamato WIFI lo standard fa parte della famiglia di reti locali (standard 802), ovvero aree geografiche limitate, e viene principalmente usato per le reti all'interno di edifici.
+
+È importante sottolineare come lo standard non è pensato per fornire servizi di connessione come 3G, 4G o 5G, offre invece servizi come la gestione dell'alimentazione, dell'accesso al mezzo di comunicazione condiviso e meccanismi di sicurezza.
+
+La velocità di trasmissione può variare molto in quanto dipende dalla qualità del segnale (SNR), dal tasso di codifica, dalla larghezza del canale e dal fatto che va divisa per ogni stazione connessa.
+
+![[Standard WIFI.excalidraw|1000]]
+
+- 802.11 a salto di frequenze: 79 bande di frequenza a 1MHz, banda da 2,4 GHz e fino a 2 Mbps;
+- 802.11 a sequenza diretta: sequenza di chipping a 11 bit (1 bit -> 11 bit), banda da 2,4 GHz e fino a 2 Mbps;
+- 802.11b: variante della sequenza diretta e fino a 11 Mbps;
+- 802.11a: fino a 54 Mbps tramite OFDM e opera su una banda di 5 GHz;
+- 802.11g: retrocompatibile con 802.11b, utilizza la banda a 2,4 GHz con OFDM e fornisce fino a 54 Mbps;
+- 802.11n: utilizza le bande da 2.4 e 5.4 GHz con OFDM, fornisce fino a 300 Mbps e permette MIMO;
+- 802.11ac: utilizza la banda da 5 GHz, fornisce fino a 1300 Mbps e permette MIMO.
+
+**OFDM**:
+
+L'_Orthogonal Frequency-Division Multiplexing_ è uno schema di multiplazione a divisione di frequenza (FDM) in cui un gran numero di segnali a sottoportanti (_sub-carriers_) ortogonali strettamente distanziate viene utilizzato per trasportare i dati su canali paralleli.
+
+![[OFDM.excalidraw|500]]
+
+Questa è una tecnica originata dalla DSL che consente di codificare segnali digitali suddividendoli in sottoportanti indipendenti, così da sfruttare pienamente la banda disponibile.
+
+Gli intervalli di frequenze sono suddivisi in canali (sottoportanti), $f_C$ indica la frequenza centrale di riferimento e ogni canale trasporta una parte dei bit in parallelo, utilizzando l’intero spettro.
+
 ### IEEE 802.11 – Collision avoidance
+
+
 
 ### IEEE 802.11 – Formato dei frame
 
@@ -181,3 +243,5 @@ $$
 
 [^3]: *CRC-32*: $C(x) = x^{32} + x^{26} + x^{23} + x^{22} + x^{16} + x^{12} + x^{11} + x^{10} + x^{8} + x^{7} + x^{5} + x^{4} + x^{2} + x + 1$
 ![[Lezione 2 - gg m yy#Cyclic Redundancy Check]]]
+
+[^4]: Comunicazione di tipo asimmetrica.
