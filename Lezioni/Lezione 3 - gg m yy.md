@@ -205,13 +205,105 @@ Gli intervalli di frequenze sono suddivisi in canali (sottoportanti), $f_C$ indi
 
 ### IEEE 802.11 – Collision avoidance
 
+![[Collision 1.excalidraw|400]]
 
+In questo caso ci sono quattro stazioni, ognuna in grado di inviare e ricevere dei segnali che raggiungono solo i nodi contenuti nella loro area.
+
+Si supponga che A e C vogliano comunicare con B, non sapendo l'uno della presenza dell'altro ciascuno invia un frame, questi due poi si scontrano e B non riesce a codificarli.
+
+A differenza di Ethernet né A né C sono consapevoli della collisione e sono quindi detti _hidden nodes_ l'uno rispetto l'altro.
+
+Il protocollo CSMA/CD non è quindi adatto, inoltre, le stazioni possono o ascoltare o trasmettere, non possono quindi rilevare la presenza di collisioni durante l'invio.
+
+![[Collision 2.excalidraw|400]]
+
+C'è anche il problema dell'_exposed node_, si supponga che B stia inviando ad A, C è a conoscenza di questa trasmissione perché riceve la trasmissione di B ma sarebbe sbagliato concludere che non può trasmettere, C può quindi trasmettere con D in quanto non interferisce con la capacità di A di ricevere da B.
+
+Per risolvere questi problemi si introduce quindi la gestione delle comunicazioni tramite turni.
+
+**CSMA/CD**:
+
+Il _Carrier Sense Multiple Access with Collision Avoidance_ è un algoritmo simile a quello Ethernet ma adattato ad una visione incompleta della rete in cui la differenza principale è la sostituzione della Collision Detection con la _Collision Avoidance_.
+
+L'algoritmo prevede che prima di inviare i dati effettivi, il mittente e ricevitore si scambiano dei frame di controllo che servono a verificare se sono in una posizione da poter comunicare e anche ad avvisare i nodi vicini che sta per iniziare una trasmissione in modo che rimangano in silenzio.
+
+Il mittente invia un _Request to Send_ (_RTS_), questo include un campo _DURATION_ che specifica per quanto tempo il mittente intende riservare il mezzo, includendo l’intera trasmissione fino alla ricezione dell'ACK.
+
+Se il ricevitore riceve correttamente l'RTS allora risponde con un _Clear to Send_ (_CTS_) che contiene lo stesso valore DURATION in modo da confermare ed autorizzare la connessione.
+
+A questo punto avviene l'invio effettivo dei dati in cui il ricevitore invia un ACK al mittente quando termina la ricezione.
+
+**SIFS**:
+
+Lo _Short Inter Frame Space_ è un intervallo di tempo di pausa che intercorre tra la fine e l'inizio di un frame, questo serve a fornire il tempo alle componenti elettroniche per cambiare modalità (ricezione / trasmissione) e al ricevitore per elaborare il messaggio.
+
+**DIFS**:
+
+È il tempo che intercorre tra la fine e l'inizio di una nuova comunicazione, corrisponde a un $\textnormal{SIFS} + 2\ \textnormal{slot time}$.
+
+**NAV**:
+
+Il _Network Allocation Vector_ è il tempo in cui gli altri nodi non possono trasmettere in quanto hanno ricevuto un RTS con una durata di comunicazione che indica il loro periodo di attesa, si risolve così il problema dei nodi nascosti.
+
+> [!info]
+> Qualsiasi nodo che vede l'RTS ma non il CTS non è abbastanza vicino al ricevitore per interferire con esso ed è quindi libero di trasmettere, si risolve così il problema dei nodi esposti.
+
+**Problema**:
+
+Se due o più nodi rilevano un collegamento inattivo e cercano di trasmettere un RTS allo stesso momento i due frame si scontreranno.
+
+L'802.11 non supporta il rilevamento delle collisioni e quindi i mittenti si accorgono della collisione solo quando non ricevono il CTS, si utilizza allora lo stesso algoritmo di backoff esponenziale utilizzato su Ethernet.
+
+Si aggiunge poi l'uso degli ACK in cui il ricevitore invia un ACK dopo ogni frame ricevuto con successo, i nodi devono quindi attendere la fine dell'ACK prima di provare a trasmettere.
 
 ### IEEE 802.11 – Formato dei frame
 
+![[Frame.excalidraw|1000]]
+
+Nello standard 802.11 sono presenti diversi tipi di frame, come DATA, RTS, CTS, ACK e BEACON[^5], identificabili dai bit Type e Subtype del campo Frame Control.
+
+La struttura generale del frame è simile a quella Ethernet, ma differisce per un’intestazione più articolata: 
+- I campi _To DS_ e _From DS_ per il sistema di distribuzione;
+- Il campo _Power Management_ per la gestione energetica;
+- Il bit _WEP_ per un'eventuale cifratura dei dati.
+
+Il campo _Frame Control_ (16 bit) è seguito dal campo _Durata/ID_, utilizzato dal meccanismo CSMA/CA per impostare il NAV o, nei Beacon, per trasportare l’identificatore della rete. Seguono fino a quattro indirizzi MAC e il campo _Sequence Control_, utile per la frammentazione.
+
+Le dimensioni complessive dipendono dal tipo di frame: i frame di controllo sono generalmente più compatti, mentre i frame DATA includono 30 byte di intestazione, fino a 2312 byte di payload ed un FCS di 4 byte finale.
+
+![[Pacchetti di controllo.excalidraw|500]]
+
+L’uso di RTS, CTS e ACK introduce un notevole overhead: a ogni trasmissione di un frame DATA si sommano le dimensioni dei frame di controllo e degli intervalli temporali richiesti dal protocollo (SIFS e DIFS), aumentando il costo complessivo della comunicazione.
+
+Quando si instaura una connessione si ha quindi un alto overhead poiché ogni frame DATA necessita di un intestazione di 82 byte a cui vanno sommati gli intervalli SIFS e DIFS.
+
+> [!example]
+> Si supponga di voler trasmettere un messaggio in 802.11g a 54 Mbps
+> Il CSMA/CA aggiunge: $1\ \textnormal{DIFS} + 3\ \textnormal{SIFS} = 4\ \textnormal{SIFS} + 2\ \textnormal{Slot time} = 4 \cdot 10 + 2 \cdot 9 = 54 \mu s$ che equivalgono a $58 \mu s \times 54 Mbps = 391,5\ \textnormal{byte}$
+> L'intestazione del fra,e il CRC e altri frame inviati hanno lunghezza totale di 82 byte
+> La trasmissione completa introduce un overhead di $473,5$ byte per transazione
+> Se il carico utile fosse di 1500 byte l'efficienza non supererebbe il $\frac{1500}{1500+473,5}=76\%$
+> Si ottiene che la larghezza di banda netta è $\leq$ 41 Mbps e non 54 Mbps
+> L'Ethernet raggiungeva un efficienza del $97\%$
+> 
+> Si nota quindi che i router inviano i pacchetti alla velocità dichiarata ma quelli realmente utili sono di meno, ottenendo un efficienza minore.
+
+I dati trasmessi quando maggiori di 2312 byte sono divisi in più frame chiamati _frammenti_, essi hanno tutti il bit _MoreFrag_ impostato a 1 tranne l'ultimo e causano un ulteriore overhead dato che viene inviato un ACK per ogni pacchetto.
+
+Questo metodo è poco usato dato che se si perdesse un solo pacchetto si perderebbe l'intera comunicazione.
+
 ### IEEE 802.11 – Distribuzione
 
+Gli access point sono collegati tramite un  _Distribution System_ (DS). In questo contesto il _roaming_ consente di far apparire tutti gli access point collegati al DS come un’unica rete, permettendo quindi al dispositivo di passare da uno ad un altro mantenendo la continuità del servizio.
+
+In questo processo assumono un ruolo centrale i quattro campi di indirizzo del frame 802.11: mittente, destinatario, access point di origine e access point di destinazione, la loro interpretazione varia in base ai bit To DS e From DS presenti nel campo Frame Control:
+- Mittente e destinatario collegati allo stesso access point: entrambi i bit DS a 0; Addr1 è il destinatario, Addr2 è il mittente.
+- Quando è necessario attraversare un access point, uno dei campi di indirizzo aggiuntivi viene utilizzato per indicarlo.
+- Con entrambi i bit DS impostati a 1, il frame passa da un nodo wireless al sistema di distribuzione e poi a un altro nodo wireless, qui Addr1 indica la destinazione finale, Addr2 il mittente immediato, Addr3 la destinazione intermedia e Addr4 la sorgente originale.
+
 ## Bluetooth – 802.15
+
+Questo protocollo viene spesso utilizzati per comunicazioni a brevissimo raggio.
 
 ## Switching e Forwarding
 
@@ -245,3 +337,5 @@ Gli intervalli di frequenze sono suddivisi in canali (sottoportanti), $f_C$ indi
 ![[Lezione 2 - gg m yy#Cyclic Redundancy Check]]]
 
 [^4]: Comunicazione di tipo asimmetrica.
+
+[^5]: Usato dall'algoritmo di scansione per trovare l'SSD degli access point.
