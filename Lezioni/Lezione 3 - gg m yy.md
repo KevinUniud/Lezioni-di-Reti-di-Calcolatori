@@ -303,39 +303,90 @@ In questo processo assumono un ruolo centrale i quattro campi di indirizzo del f
 
 ## Bluetooth – 802.15
 
-Questo protocollo viene spesso utilizzati per comunicazioni a brevissimo raggio.
+Il Bluetooth:
+- Opera nella banda a 2,45 GHz con FHSS;
+- Ha una portata di 10-50 m;
+- Ha basso consumo energetico;
+- I dispositivi appartengono ad un individuo o gruppo e vengono classificati come _Personal Area Network_ (_PAN_).
 
-## Switching e Forwarding
+È da notare come il Bluetooth non è un protocollo ma una suite di protocolli, le diverse varianti definite in base agli scopi di applicazione vanno oltre il livello di collegamento definendo i protocolli applicativi e vengono definiti _profili_.
 
-### Switch
+![[Protocolli.excalidraw|1000]]
 
-**Topologia a stella**:
+I protocolli _core_ sono quelli implementati in tutti i sistemi Bluetooth e riguardano gli aspetti fisici, radio e baseband del livello 1 e le le logiche link del livello 2.
 
-### Approccio switching and forwarding
+L'_RFCOMM_ simula una porta seriale come se fosse un modem telefonico.
 
-**Approccio senza connessione**:
+Tra i protocolli in azzurro c'è il l'_Object Exchange_ (_OBEX_) su cui sono implementati i moduli TCP/UDP che tramite seriale RFCOMM, protocollo PPP e IP, implementano uno scambio di messaggi come il HTTP.
 
-**Approccio con connessione**:
+Si forniscono quindi questi tipi di connessioni:
+- **Sincrono orientato alla connessione (SCO)**: Simmetrico, a commutazione di circuito, punto a punto, utilizzato per i dati in tempo reale;
+- **Collegamento asincrono senza connessione (ACL)**: A commutazione di pacchetto, punto-multipunto, polling master, utilizzato per il trasferimento di dati.
 
-**Approccio source routing**:
+La configurazione di base della rete Bluetooth è chiamata _piconet_ e consiste in un dispositivo _master_ (eletto all'interno della piconet) e fino a sette dispositivi _slave_ più otto inattivi.
 
-## Bridge e Switch LAN
+> [!warning]
+> Il dispositivo master non è da confondere con l'access point, essi svolgono due ruoli differenti.
 
-### Distributed Spanning Tree
+Ogni comunicazione avviene a turno tra master e slave e se uno slave vuole comunicare con un altro deve passare attraverso il master.
 
-**Funzionamento pratico dell’algoritmo**:
+I tempi di comunicazione sono organizzati tramite Time Division Multiplexing[^6] in slot da $625\mu s$ e l'ordine viene imposto dal master, tutti i dispositivi sono così sincronizzati e si evitano le collisioni.
 
-**Limitazioni di questo algoritmo**:
+Gli slave si sincronizzano sul clock fornito dal master e negli slot pari parla sempre il master mentre in quelli dispari può parlare lo slave a cui è stato assegnato.
 
-**Limitazioni dei bridge**:
+Dato che può esserci silenzio di comunicazione da parte dello slave il sistema non è completamente efficiente in quanto i turni non vengono modificati in base alle esigenze dei dispositivi.
+
+![[Master-Slave.excalidraw|1000]]
+
+- $f(k)$: Il master trasmette un frame verso Slave 2.
+- $f(k+1)$: Slave 2 risponde al master.  
+    Questo frame contiene i dati destinati a Slave 1, ma il master li interpreta come destinati a sé perché gestisce lui la comunicazione.
+- $f(k+2)$: Il master trasmette a Slave 1 i dati ricevuti da Slave 2.
+- $f(k+3)$: Slave 1 risponde al master.
+- $f(k+4)$: Il master trasmette la risposta a Slave 2.
+
+È possibile inviare più frame consecutivi, senza attendere lo slot successivo, ma:
+- Devono essere in numero dispari (1, 3 o 5 slot consecutivi);
+- Al massimo 5 slot perché oltre aumenterebbe il ritardo per gli altri dispositivi della piconet.
+Questo consente di aumentare temporaneamente la banda disponibile nella comunicazione master-slave senza violare l’alternanza dei ruoli.
+
+Nell'immagine, i trattini neri precedenti alla comunicazione rappresentano i salti di frequenza pseudo-casuali stabiliti dal master, usati per consentire il passaggio dell’elettronica tra le diverse modalità operative .
+
+> [!important]
+> Ogni trasmissione avviene su un canale differente.
+
+### Formato dei pacchetti
+
+![[Pacchetto Bluetooth.excalidraw|1000]]
+
+La prima parte è formata da un codice di accesso per la sincronizzazione derivato dal master.
+
+Segue poi l'intestazione del pacchetto (per ACL) composta da:
+- 1/3-FEC;
+- Indirizzo MAC;
+- Tipo di collegamento;
+- ARQ/SEQ;
+- Checksum (HEC).
+
+La grandezza del payload dipende da quanti slot si occupano:
+- Con uno slot si hanno 483 bit;
+- Con tre slot si hanno 1124 bit;
+- Con cinque slot di hanno 2745 bit.
+
+> [!info]
+> È possibile connettere tra di loro due o più piconet creando così delle _scatternet_ in cui i master fanno da intermediari da una sottorete all'altra
+> Il nodo condiviso funge da ponte tra le due reti: riceve un frame da un master e lo invia ad un altro
+> I master di ciascuna piconet devono tenere traccia delle posizioni dei nodi per poter inoltrare i frame al nodo intermediario corretto.
 
 [^1]: ![[Architettura_ISO_OSI.excalidraw]]
 
 [^2]: ![[Lezione 1 - 14 Novembre 2025#Codifica Manchester]]
 
 [^3]: *CRC-32*: $C(x) = x^{32} + x^{26} + x^{23} + x^{22} + x^{16} + x^{12} + x^{11} + x^{10} + x^{8} + x^{7} + x^{5} + x^{4} + x^{2} + x + 1$
-![[Lezione 2 - gg m yy#Cyclic Redundancy Check]]]
+![[Lezione 2 - 21 Novembre 2025#Cyclic Redundancy Check]]]
 
 [^4]: Comunicazione di tipo asimmetrica.
 
 [^5]: Usato dall'algoritmo di scansione per trovare l'SSD degli access point.
+
+[^6]: ![[Lezione 1 - 14 Novembre 2025#Introduzione]]

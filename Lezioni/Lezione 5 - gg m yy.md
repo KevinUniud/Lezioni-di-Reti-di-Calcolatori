@@ -1,3 +1,22 @@
+## Routing
+
+### Routing vs forwarding
+
+### Algoritmi di routing
+
+### Vettore di distanza (distance vector)
+
+### Algoritmo di Bellman-Ford
+
+### Problema del conteggio all’infinito
+
+### Protocollo di informazione di routing (RIP)
+
+### Stato dei collegamenti (link state)
+
+### Instradamento sul percorso più breve (Dijkstra)
+
+### Protocollo Open Shortest Path First (OSPF)
 ## Instradamento inter-dominio
 
 ### Propagazione del percorso (Route Propagation)
