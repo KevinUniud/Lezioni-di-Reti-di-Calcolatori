@@ -37,6 +37,8 @@ Gli indirizzi vengono usati per riconoscere mittente e destinatario, quando l'ad
 
 Un indirizzo speciale è il _FF:FF:FF:FF:FF:FF_ (cioè tutti 1) ed è l'indirizzo di _broadcast_ che viene sempre accettato da tutte le stazione connesse alla rete ed in ascolto.
 
+L'algoritmo prende il nome di _Media Access Control_ (_MAC_) e viene eseguito dalla parte hardware.
+
 ### Algoritmo di ricezione Ethernet
 
 Se vengono utilizzati dei mezzi condivisi allora realizzare un sistema broadcast risulta molto facile, questo perché tutti i pacchetti inviati sul bus vengono visti da tutti.
@@ -44,8 +46,6 @@ Se vengono utilizzati dei mezzi condivisi allora realizzare un sistema broadcast
 Il sistema _multicast_ risulta simile, sfrutta la comunicazione condivisa con l'aggiunta di essere identificato unicamente da un insieme di indirizzi specifico.
 
 ### Algoritmo di trasmissione Ethernet
-
-L'algoritmo prende il nome di _Media Access Control_ (_MAC_) e viene eseguito dalla parte hardware.
 
 Una volta che l'intestazione del frame da trasmettere è realizzata l'algoritmo mette l'adattatore in ascolto sulla linea, in caso di linea libera (0V) trasmette il pacchetto, in caso di linea occupata si sa che il limite superiore del messaggio è di 1500 byte, l'adattatore aspetta quindi un intervallo di tempo (_inter packet gap_, _IPG_) e riprova ad inviare. 
 
@@ -221,7 +221,7 @@ C'è anche il problema dell'_exposed node_, si supponga che B stia inviando ad A
 
 Per risolvere questi problemi si introduce quindi la gestione delle comunicazioni tramite turni.
 
-**CSMA/CD**:
+**CSMA/CA**:
 
 Il _Carrier Sense Multiple Access with Collision Avoidance_ è un algoritmo simile a quello Ethernet ma adattato ad una visione incompleta della rete in cui la differenza principale è la sostituzione della Collision Detection con la _Collision Avoidance_.
 
@@ -313,7 +313,7 @@ Il Bluetooth:
 
 ![[Protocolli.excalidraw|1000]]
 
-I protocolli _core_ sono quelli implementati in tutti i sistemi Bluetooth e riguardano gli aspetti fisici, radio e baseband del livello 1 e le le logiche link del livello 2.
+I protocolli _core_ sono quelli implementati in tutti i sistemi Bluetooth e riguardano gli aspetti fisici, radio e baseband del livello 1 e le logiche link del livello 2.
 
 L'_RFCOMM_ simula una porta seriale come se fosse un modem telefonico.
 
@@ -376,7 +376,7 @@ La grandezza del payload dipende da quanti slot si occupano:
 > [!info]
 > È possibile connettere tra di loro due o più piconet creando così delle _scatternet_ in cui i master fanno da intermediari da una sottorete all'altra
 > Il nodo condiviso funge da ponte tra le due reti: riceve un frame da un master e lo invia ad un altro
-> I master di ciascuna piconet devono tenere traccia delle posizioni dei nodi per poter inoltrare i frame al nodo intermediario corretto.
+> I master di ciascuna piconet devono tenere traccia di quali nodi appartengono a più sottoreti per poter inoltrare i frame al nodo intermediario corretto.
 
 [^1]: ![[Architettura_ISO_OSI.excalidraw]]
 

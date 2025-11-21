@@ -97,7 +97,7 @@ Il trailing è il codice di controllo ridondante che non aggiunge alcuna informa
 
 **Parità uni-dimensionale**:
 
-Il _one_dimensional parity_ controlla un bit extra di parità che viene aggiunto ad un codice di $n$ bit in modo da rendere il totale pari.
+Il _one dimensional parity_ controlla un bit extra di parità che viene aggiunto ad un codice di $n$ bit in modo da rendere il totale pari.
 
 È da notare che se avvengono un numero pari di errori allora non verranno rilevati.
 
@@ -171,7 +171,7 @@ In questo protocollo ci si pone in ascolto di una risposta dopo l'invio di un me
 Esistono quattro diversi scenari:
 - *a*) Il messaggio ACK viene ricevuto entro il timeout;
 - *b*) Il messaggio originale viene perso, scade il timeout e si re-invia il pacchetto;
-- *c*) Il messaggio originale viene ricevuto ma l'ACK di perde, si necessita quindi di un re-invio del pacchetto iniziale, questo perché il mittente non può essere notificato dell'avvenuta ricezione;
+- *c*) Il messaggio originale viene ricevuto ma l'ACK si perde, si necessita quindi di un re-invio del pacchetto iniziale, questo perché il mittente non può essere notificato dell'avvenuta ricezione;
 - *d*) Il timeout scade sempre prima della ricezione dell'ACK.
 
 I casi *c* e *d* sono i più problematici, nel primo il destinatario riceve due volte lo stesso pacchetto e deve capire se l'invio doppio è un fattore voluto dal mittente oppure è perché non è stato ricevuto l'ACK, nel secondo si ha lo stesso problema solo che si aggiunge il dilemma lato mittente sul capire se l'ACK arrivato è del primo o secondo pacchetto inviato.
@@ -235,7 +235,7 @@ Il mittente e destinatario devono tenere conto dello stato dei pacchetti e riman
 Questo sistema ha perdite di efficienza poiché bisogna aspettare gli ACK, possono esserci dei timeout, ci sono dei re-invii in caso di errori o scarti.
 
 Per migliorare la situazione si possono utilizzare diversi ACK:
-- _Negative Acknowledgement (NAK)_: All'arrivo di un nuovo frame se non è arrivato l'ACK per il precedente di invia un NAK;
+- _Negative Acknowledgement (NAK)_: All'arrivo di un nuovo frame se non è arrivato l'ACK per il precedente si invia un NAK;
 - _Additional Acknowledgement_: All'arrivo di un nuovo frame si invia l'ultimo ACK ricevuto (metodo utilizzato in TCP);
 - _Selective Acknowledgement_: Il ricevitore tutti i frame, può quindi chiedere quelli mancanti pur continuando ad accettare gli altri.
 

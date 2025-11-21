@@ -6,7 +6,6 @@
       {
         "id": "3db8eece18da1a02",
         "type": "tabs",
-        "dimension": 50,
         "children": [
           {
             "id": "890c81a83ae2220d",
@@ -21,14 +20,7 @@
               "icon": "lucide-file",
               "title": "Lezione 4 - gg m yy"
             }
-          }
-        ]
-      },
-      {
-        "id": "1cf3d08fc15b524a",
-        "type": "tabs",
-        "dimension": 50,
-        "children": [
+          },
           {
             "id": "bb6bb0fa9ed7913d",
             "type": "leaf",
@@ -207,10 +199,13 @@
   "lastOpenFiles": [
     "appunti.pdf",
     "Lezioni/Lezione 4 - gg m yy.md",
-    "Lezioni/Lezione 3 - gg m yy.md",
-    "Images/Lezione 3/Collision 2.excalidraw.md",
-    "Lezioni/Lezione 2 - 21 Novembre 2025.md",
     "Lezioni/Lezione 1 - 14 Novembre 2025.md",
+    "Lezioni/Lezione 3 - 21 Novembre 2025.md",
+    "Images/Lezione 3/OFDM.excalidraw.md",
+    "Lezioni/Lezione 2 - 21 Novembre 2025.md",
+    "Images/Lezione 3/Pacchetto ethernet.excalidraw.md",
+    "Images/Lezione 2/BISYNC.excalidraw.md",
+    "Images/Lezione 3/Collision 2.excalidraw.md",
     "Lezioni/Lezione 6 - gg m yy.md",
     "Lezioni/Lezione 5 - gg m yy.md",
     "Images/Lezione 3/Pacchetto Bluetooth.excalidraw.md",
@@ -218,10 +213,8 @@
     "Images/Lezione 3/Protocolli.excalidraw.md",
     "Images/Lezione 3/Pacchetti di controllo.excalidraw.md",
     "Images/Lezione 3/Frame.excalidraw.md",
-    "Images/Lezione 3/Pacchetto ethernet.excalidraw.md",
     "Images/Lezione 3/Standard WIFI.excalidraw.md",
     "Images/Lezione 3/Collision 1.excalidraw.md",
-    "Images/Lezione 3/OFDM.excalidraw.md",
     "Images/Lezione 1/TCP-IP.excalidraw.md",
     "Images/Lezione 1/Router.excalidraw.md",
     "Images/Lezione 1/Repeater.excalidraw.md",
@@ -230,7 +223,6 @@
     "Images/Lezione 3",
     "Images/Lezione 2/PPP.excalidraw.md",
     "Images/Lezione 2/HDLC.excalidraw.md",
-    "Images/Lezione 2/BISYNC.excalidraw.md",
     "Images/Lezione 2/DDCMP.excalidraw.md",
     "Images/Lezione 2",
     "Images/Lezione 1",
