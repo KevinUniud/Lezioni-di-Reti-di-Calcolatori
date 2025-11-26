@@ -96,49 +96,214 @@ Il modello è molto diffuso nello studio e nella progettazione della sicurezza s
 
 ## Posizionamento della sicurezza
 
-* **Sicurezza del collegamento (link security):** la cifratura avviene tra singoli collegamenti; richiede molti dispositivi con chiavi accoppiate; protegge dati “in transito” tra router ma non end-to-end.
-* **Sicurezza end-to-end:** la cifratura avviene tra sorgente e destinazione finale; richiede dispositivi alle estremità con chiavi condivise; protegge i contenuti ma lascia intestazioni in chiaro.
-* Entrambe possono essere combinate: end-to-end per proteggere contenuti e autenticazione, collegamento per proteggere flussi di traffico.
+Esistono due modi principali di posizionare la sicurezza nelle comunicazioni:
+
+**1. Sicurezza del collegamento (link security)**
+Ogni collegamento della rete applica autonomamente la trasformazione di sicurezza. I dati vengono cifrati e decifrati a ogni hop. Richiede molte chiavi e dispositivi ed è limitata ai livelli più bassi dello stack (fisico e datalink). Protegge i flussi di traffico, ma tra un router e l’altro i dati transitano in chiaro.
+
+**2. Sicurezza end-to-end**
+La cifratura avviene direttamente tra sorgente e destinazione. Protegge i contenuti lungo tutto il percorso, ma lascia in chiaro le intestazioni necessarie all’instradamento. Si applica dai livelli superiori (rete, trasporto, applicazione).
+Le due soluzioni sono complementari: la prima protegge i flussi, la seconda i contenuti.
 
 ### Sicurezza nei vari livelli
 
-* **Fase generale:** più alto è il livello, meno informazioni protette ma maggiore sicurezza e complessità; più chiavi necessarie $O(n^2)$.
-* **Fisico:** sensori per intrusioni fisiche; costoso, difficile da bypassare fisicamente.
-* **Collegamento dati:** protezione tramite schede di rete (es. WEP, WPA); vulnerabile ai router e agli sniffing di MAC address.
-* **Rete:** sicurezza implementata nel kernel (es. IPsec, VPN); trasparente agli sviluppatori, copre dati e intestazioni di trasporto.
-* **Presentazione/Trasporto:** sicurezza end-to-end tramite librerie/API (es. TLS/SSL); protegge dati applicativi e intestazioni, ma non indirizzi/porte.
-* **Applicazione:** cifratura specifica delle applicazioni (es. Telegram, SSH, PGP, Signal); protegge solo il payload, header in chiaro.
+Spostando la sicurezza verso livelli più alti:
 
-Le cifrature si applicano a strati (“stile cipolla”), con ogni livello che cifra i dati del livello superiore, generando una protezione multilivello dei dati.
+* diminuiscono le informazioni protette,
+* aumenta la qualità della protezione,
+* cresce il numero di chiavi necessarie,
+* aumenta l’onere per programmatori e sistemi.
+
+La quantità di chiavi cresce in $O(n^2)$.
+
+**Livello fisico**
+
+Protezione del mezzo tramite sensori e dispositivi anti-manomissione. Costosa, valida solo su collegamenti controllati.
+
+**Livello collegamento dati**
+
+Protezione implementata nelle schede di rete (WEP, WPA). Copre dati dell’applicazione, trasporto e intestazione di rete, ma non l’intestazione del frame. Vulnerabile quando il traffico passa dai router.
+
+**Livello rete**
+
+Protezione a livello di sistema, trasparente per gli sviluppatori (IPsec, VPN). Copre dati applicativi e intestazione del trasporto, non l’intestazione IP.
+
+**Livello trasporto/presentazione**
+
+Sicurezza end-to-end tramite librerie/API (TLS/SSL). Copre i dati applicativi e parte dell’intestazione, non porte e indirizzi.
+
+**Livello applicazione**
+
+Crittografia integrata nelle applicazioni (PGP, S/MIME, SSH, Signal, MTProto, OAuth2). Protegge solo il payload. Specifica per ogni servizio.
+
+Le cifrature si applicano “a cipolla”: ogni livello aggiunge la propria protezione al pacchetto del livello superiore. A valle, un messaggio può risultare cifrato più volte, una per ciascun livello che implementa sicurezza.
 
 ## Crittografia
 
+La crittografia è un meccanismo di sicurezza fondamentale che consente di proteggere le comunicazioni trasformando il testo in chiaro in testo cifrato tramite un algoritmo e una chiave. Esistono due tipi principali: simmetrica (a chiave privata) e asimmetrica (a chiave pubblica), utilizzati per scopi diversi.
+
+Terminologia essenziale:
+
+* testo in chiaro: messaggio originale
+* testo cifrato: messaggio codificato
+* cifrario: algoritmo di cifratura
+* chiave: informazione segreta usata per cifrare/decifrare
+* cifrare/decifrare: trasformazione da chiaro a cifrato e viceversa
+* crittografia: studio dei metodi di cifratura
+* crittoanalisi: studio dei metodi per rompere un cifrario senza conoscere la chiave
+* crittologia: insieme di crittografia e crittoanalisi
+
 ### Crittografia simmetrica
+
+Mittente e destinatario condividono la stessa chiave segreta. È la forma storicamente più antica e ancora ampiamente utilizzata. Per essere sicura richiede:
+
+1. un algoritmo robusto, tale che senza la chiave non sia possibile risalire al testo in chiaro;
+2. due funzioni matematiche di cifratura e decifratura coerenti, tali che decifrare ciò che è stato cifrato con la stessa chiave restituisca sempre il messaggio originale.
 
 ### Principio di Kerckhoff
 
+La sicurezza deve dipendere solo dalla segretezza della chiave, non dall’algoritmo, che si assume essere pubblico. Un sistema che si basa sulla segretezza del codice sorgente è considerato inaffidabile. Per questo i cifrari moderni (AES, RC4, ecc.) sono pubblici e analizzabili da tutti.
+
 ### Crittoanalisi
+
+Studia come recuperare il testo in chiaro o la chiave. Gli attacchi si distinguono in base alle informazioni disponibili:
+
+* *solo testo cifrato*: l’attaccante vede solo il testo cifrato;
+* *known plaintext*: conosce coppie testo in chiaro–testo cifrato;
+* *chosen plaintext*: può far cifrare testi a sua scelta;
+* *chosen ciphertext*: può ottenere la decifratura di testi cifrati scelti;
+* *chosen text*: combina le due precedenti.
+
+I cifrari robusti devono resistere almeno agli attacchi known-plaintext.
+
+**Brute force e sicurezza**
+Un attacco di forza bruta prova tutte le chiavi possibili. È sempre possibile in teoria, ma impraticabile in presenza di chiavi sufficientemente lunghe, perché il numero di combinazioni cresce esponenzialmente. La sicurezza può essere:
+
+* *incondizionata*: impossibile da violare indipendentemente dalla potenza computazionale;
+* *computazionale*: violazione troppo costosa rispetto al valore dell’informazione.
+
+La crittoanalisi può ridurre lo spazio delle chiavi, ma riduzioni minime (es. da 2¹²⁸ a 2¹²⁶) non rendono il cifrario realmente più debole.
 
 ## Cifrari di flusso
 
+Un **cifrario di flusso** elabora il messaggio bit o byte per volta combinandolo tramite XOR con un **keystream** pseudo-casuale generato a partire da una chiave (seed). Cifratura e decifratura coincidono, il che rende il metodo veloce ed efficiente. La sicurezza dipende da:
+
+* keystream non riutilizzato, altrimenti da (C \oplus C' = M \oplus M') si recuperano informazioni sui messaggi;
+* periodo molto lungo senza ripetizioni;
+* flusso statisticamente casuale;
+* seed sufficientemente grande.
+
 ### RC4
+
+Cifrario a flusso molto diffuso (SSL/TLS, WEP, WPA).
+Caratteristiche:
+
+* chiave variabile fino a 2048 bit;
+* stato interno costituito da una permutazione di 256 byte;
+* generazione veloce del keystream;
+* periodo estremamente lungo.
+  Funzionamento: inizializza un array S con i valori 0–255, lo rimescola usando la chiave e poi, a ogni passo, scambia elementi dell’array per produrre il byte del keystream da XORare con il messaggio.
+
+### One-Time Pad
+
+Cifrario a flusso ideale basato su un **keystream realmente casuale**, lungo quanto il messaggio e usato una sola volta. Garantisce sicurezza incondizionata: ogni ciphertext può derivare da qualunque plaintext con una chiave opportuna, quindi non esistono informazioni utili per risalire al testo originale.
+Limiti: la chiave deve essere lunga quanto il messaggio, deve essere distribuita in modo sicuro e non può essere riutilizzata.
 
 ## Cifrari a blocchi
 
+Elaborano il messaggio a blocchi di dimensione fissa (oggi tipicamente 128 bit). Un blocco grande riduce l’efficacia degli attacchi statistici. Non si può usare una tabella di sostituzione completa (richiederebbe memoria enorme), quindi si costruiscono trasformazioni complesse tramite strutture iterative.  
+I cifrari classici usano spesso la struttura di Feistel (DES), quelli moderni altre strutture (AES).
+
 ### AES
+
+Standard USA dal 2001, scelto per sostituire DES. Requisiti: cifrario simmetrico, blocchi da 128 bit, chiavi da 128/192/256 bit, più veloce e sicuro del 3DES, specifiche pubbliche.  
+Tra 15 candidati iniziali, fu selezionato Rijndael. È ampiamente usato (Blu-ray, DVB, satellitare). Implementabile in hardware molto piccolo.  
+Cifrario iterativo: opera su una matrice 4×4 di byte con sostituzioni (S-box), permutazioni, mix delle colonne e XOR con la round key per 9/11/13 round.  
+La sicurezza è elevata: gli unici attacchi pratici sono a canale laterale. È approvato per dati SECRET e TOP SECRET.
 
 ### Modalità di funzionamento dei cifrari a blocchi
 
+Quando il messaggio è più lungo del blocco, si usano modalità operative.
+
+**ECB (Electronic CodeBook)**  
+Cripta ogni blocco in modo indipendente. Blocchi uguali producono ciphertext uguali. Non protegge la struttura del messaggio. È usato solo per pochi blocchi isolati.
+
+**CBC (Cipher Block Chaining)**  
+Ogni blocco plaintext è XORato con il ciphertext precedente; serve un IV iniziale. Blocchi dipendenti tra loro: una modifica si propaga nei blocchi successivi. Usato per grandi quantità di dati. L’IV deve essere gestito con cura.
+
+**OFB (Output FeedBack)**  
+Genera un flusso pseudo-casuale indipendente dal messaggio; ciphertext = plaintext XOR keystream. Gli errori non si propagano. Non deve mai riutilizzare la stessa coppia chiave+IV.
+
+**CTR (Counter Mode)**  
+Cripta valori di un contatore; ciphertext = plaintext XOR E_K(contatore). Permette parallelizzazione, precomputazione ed è ideale per reti ad alta velocità e file system crittografati. Mai riutilizzare la stessa combinazione chiave+contatore.
+
 ## Integrità e autenticazione dei messaggi
 
-### Autenticazione dei messaggi tramite crittografia simmetrica
+Proteggono i dati da modifiche e confermano l’identità del mittente. I meccanismi principali sono:
 
-### Codice di autenticazione del messaggio (MAC)
+1. cifratura del messaggio
+2. MAC (Message Authentication Code)
+3. funzioni di hash
+
+Gli attacchi alla sicurezza includono: divulgazione, analisi del traffico, mascheramento, modifiche a contenuto/sequenza/tempistica, ripudio della fonte o del destinatario.
+
+**Modello generale di autenticazione**
+Si usa un autenticatore (al mittente) e un verificatore (al destinatario). Al messaggio vengono aggiunti dati che permettono di verificarne integrità e autenticità.
+
+### Autenticazione tramite crittografia simmetrica
+
+Con una chiave condivisa:
+
+* il destinatario sa che il mittente è autentico;
+* eventuali modifiche sono rilevabili tramite ridondanza;
+* resta possibile il ripudio, perché entrambe le parti conoscono la stessa chiave.
+
+### MAC (Message Authentication Code)
+
+Il MAC è un piccolo blocco calcolato da:
+MAC = C_K(M)
+dipende dal messaggio e da una chiave segreta.
+Proprietà:
+
+* garantisce integrità e autenticità (chiave condivisa)
+* non è una firma digitale
+* non richiede cifratura del MAC
+* funzione molti-a-uno, ma difficile trovare collisioni utili
 
 ### Funzioni di hash
 
-### Algoritmo di Sicure Hash (SHA)
+Funzione pubblica che produce:
+h = H(M)
+con questi requisiti: output fisso, facile da calcolare, non invertibile, resistente a pre-immagine, seconda pre-immagine e collisione.
+Usi: rilevamento modifiche, costruzione di MAC e firme digitali.
 
-### Uso degli Hash Digest nell’autenticazione dei messaggi
+**SHA**
+SHA-1 produce hash a 160 bit ma è indebolito. SHA-256/384/512 (FIPS 180-2) offrono sicurezza più elevata.
+### HMAC
 
-### Wired Equivalent Privacy (WEP)
+MAC basato su funzione di hash:
+HMAC_K = Hash[(K+ ⊕ opad) || Hash[(K+ ⊕ ipad) || M]]
+Sicurezza collegata alla robustezza della funzione hash base. Resistente ad attacchi di forza bruta e attacchi di compleanno.
+
+### Esempio applicativo: WEP
+
+WEP (1999) usa una chiave simmetrica condivisa tra host e access point.
+Il payload + checksum (ICV) sono cifrati con RC4 usando un IV a 24 bit inviato in chiaro.
+
+**Gravi vulnerabilità WEP**
+
+* IV troppo corto: ripetizioni frequenti (attacco del compleanno)
+* RC4 debole per alcuni IV
+* ripetizione della chiave per lungo tempo
+  Con IV ripetuti: C1 ⊕ C2 = P1 ⊕ P2 → analisi e recupero dei plaintext.
+
+### Correzioni (WPA/WPA2)
+
+802.11i (2004) introduce:
+
+* handshake a 4 vie (PMK → PTK)
+* TKIP: usa RC4 con chiavi temporanee (WPA)
+* CCMP: usa AES in CTR/CBC-MAC (WPA2)
+
+**Ancora vulnerabile**
+KRACK (2017): attacco di reinstallazione della chiave che sfrutta la ritrasmissione dei messaggi dell’handshake. In certe configurazioni permette decifrare e talvolta falsificare pacchetti.
