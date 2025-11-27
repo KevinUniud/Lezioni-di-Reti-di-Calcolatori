@@ -1,8 +1,9 @@
 ## Routing
 
-**Instradamento (routing) e inoltro (forwarding)** operano su due piani distinti.
+_Instradamento (routing) e inoltro (forwarding)_ operano su due piani distinti.
 
 **Forwarding (data plane)**
+
 - Funzione: scegliere l’interfaccia di uscita per ogni pacchetto in base alla tabella di inoltro.
 - Caratteristiche: semplice, molto veloce, spesso implementato in hardware.
 - Input: tabella di forwarding già costruita.
@@ -10,15 +11,20 @@
 - Attività: esamina l’indirizzo di destinazione, applica la ricerca della route più specifica, inoltra.
 
 **Routing (control plane)**
+
 - Funzione: costruire e mantenere la tabella di routing, da cui deriva la tabella di forwarding.
 - Caratteristiche: complesso, eseguito in background, reagisce a eventi (link su/giù, nuovi router, variazioni di costo).
 - Mantiene informazioni aggiuntive: costi, distanze, metriche, politiche.
 - Risultato: una tabella di routing che viene tradotta in tabella di forwarding.
 
 **Relazione tra i due piani**
-Il control plane decide *dove* i pacchetti dovrebbero passare; il data plane *li invia*. L’analogia con la guida: prima si decide il percorso (routing), poi si gestiscono sterzo e acceleratore (forwarding).
+
+Il control plane decide *dove* i pacchetti dovrebbero passare; il data plane *li invia*.
+
+L’analogia con la guida: prima si decide il percorso (routing), poi si gestiscono sterzo e acceleratore (forwarding).
 
 **Tabelle**
+
 - Tabella di routing: usata dal control plane, contiene costi, distanze, percorsi.
 - Tabella di forwarding: usata dal data plane, contiene next hop, interfacce, prefissi.
 
@@ -82,7 +88,6 @@ _RIP_ (_routing information protocol_) limita l’infinito a 16.
 ### Link State in dettaglio
 
 Ogni router:
-
 1. Misura i costi verso i vicini.
 2. Crea un LSP.
 3. Inonda l’AS con il suo LSP tramite flooding affidabile.
@@ -154,7 +159,7 @@ Con la crescita di Internet si è passati a una topologia a grafo, con molti pro
 
 ### Ruolo di BGP
 
-BGP **non ottimizza** i percorsi: garantisce **raggiungibilità** e **assenza di loop**. Gli obiettivi principali:
+BGP _non ottimizza_ i percorsi: garantisce _raggiungibilità_ e _assenza di loop_. Gli obiettivi principali:
 - **Scalabilità** delle tabelle di routing globali;
 - **Autonomia** dei domini (ogni AS applica proprie politiche);
 - **Gestione della fiducia**: un AS può decidere di ignorare annunci ritenuti indesiderabili.
@@ -176,14 +181,16 @@ In un AS tutti i router eseguono:
 - un IGP per il routing interno;
 - **iBGP** per propagare i percorsi appresi tramite eBGP.
 
-Gli annunci BGP trasportano **interi percorsi** sotto forma di lista di AS. Esempio:
-AS 100 → AS 300 → AS 400 → rete 7.7.0.0/16
+Gli annunci BGP trasportano _interi percorsi_ sotto forma di lista di AS. 
+
+> [!example]
+> AS 100 → AS 300 → AS 400 → rete 7.7.0.0/16
 
 Questa rappresentazione:
 - consente il controllo delle politiche (accettare o rifiutare un percorso);
 - previene i loop: se un AS vede sé stesso nella lista, scarta l’annuncio.
 
-Gli speaker BGP **non inoltrano direttamente il traffico** a meno che siano anche gateway; forniscono le informazioni per costruire la tabella di forwarding del dominio.
+Gli speaker BGP _non inoltrano direttamente il traffico_ a meno che siano anche gateway; forniscono le informazioni per costruire la tabella di forwarding del dominio.
 
 ### Policy routing e prevenzione dei loop
 
@@ -191,7 +198,7 @@ Un router BGP scarta un percorso se:
 - il proprio AS compare nella lista (loop inter-AS);
 - una policy locale lo proibisce (filtri per evitare certi provider o usare solo link preferiti).
 
-BGP è un protocollo **a vettore di percorso**: non è distance vector e non è link state.
+BGP è un protocollo _a vettore di percorso_: non è distance vector e non è link state.
 
 ### Esempio di propagazione
 
@@ -202,7 +209,7 @@ Gli altri provider decidono se accettare o filtrare i percorsi in base alle poli
 
 ### Problemi e requisiti di BGP
 
-- Gli **ASN** devono essere univoci; sono numeri a 32 bit assegnati da IANA e dai registri regionali.
+- Gli _ASN_ devono essere univoci; sono numeri a 32 bit assegnati da IANA e dai registri regionali.
 - BGP deve gestire centinaia di migliaia di prefissi e migliaia di AS.
 - La convergenza può essere lenta.
 - Le politiche possono rendere il routing non ottimale ma coerente con le strategie economiche dei provider.
@@ -295,7 +302,7 @@ Multicast evita duplicazioni inutili di traffico che si avrebbero usando solo un
 ### Multicast IP
 
 - Gli host inviano un solo pacchetto all’indirizzo multicast; i router duplicano i pacchetti quando necessario.
-- Il range IPv4 multicast è la **classe D**: 224.0.0.0 – 239.255.255.255.
+- Il range IPv4 multicast è la _classe D_: 224.0.0.0 – 239.255.255.255.
   - 224.0.0.0/24: uso locale
   - 224.0.1.0/24: gruppi globali IANA (es. NTP)
   - Altri gruppi allocati dinamicamente (SAP/SDP)
@@ -312,9 +319,9 @@ Il router locale coordina l’iscrizione e la consegna del traffico.
 
 Un router mantiene:
 - **Tabelle unicast**
-- **Tabelle multicast**, che definiscono gli **alberi di distribuzione** del gruppo.
+- **Tabelle multicast**, che definiscono gli _alberi di distribuzione_ del gruppo.
 
-L’insieme dei percorsi per un gruppo multicast forma un **multicast distribution tree**.
+L’insieme dei percorsi per un gruppo multicast forma un _multicast distribution tree_.
 
 ### Famiglie di alberi per il routing multicast
 
@@ -329,18 +336,18 @@ L’insieme dei percorsi per un gruppo multicast forma un **multicast distributi
 ### DVMRP (Distance-Vector Multicast Routing Protocol)
 
 Primo protocollo multicast (1988).
-Basato su distance vector e sulla tecnica **flood and prune**.
+Basato su distance vector e sulla tecnica _flood and prune_.
 
 #### Flooding
 
-- Usa **Reverse Path Flooding**: un router inoltra un pacchetto solo se proviene dall’interfaccia corrispondente al suo percorso più breve verso la sorgente.
-- Ottimizzazione: **Reverse Path Broadcast**, che assegna un router genitore per ogni LAN così da evitare duplicati.
+- Usa _Reverse Path Flooding_: un router inoltra un pacchetto solo se proviene dall’interfaccia corrispondente al suo percorso più breve verso la sorgente.
+- Ottimizzazione: _Reverse Path Broadcast_, che assegna un router genitore per ogni LAN così da evitare duplicati.
 
 #### Pruning
 
 - Le LAN senza membri del gruppo inviano messaggi di prune.
 - I rami inutili vengono tagliati.
-- Se un host si iscrive successivamente, si usa il meccanismo di **grafting** per reinserire il ramo.
+- Se un host si iscrive successivamente, si usa il meccanismo di _grafting_ per reinserire il ramo.
 
 Funziona bene su reti piccole (intra-AS).
 
@@ -357,7 +364,7 @@ Due modalità:
 	- Usa alberi basati sulla sorgente.
 2. **PIM-SM (sparse mode)**:
 	- Adatto quando pochi host partecipano (tipico su Internet).
-	- Costruisce un **albero condiviso** con un **rendezvous point (RP)**.
+	- Costruisce un _albero condiviso_ con un _rendezvous point (RP)_.
 	- I router inviano messaggi di join verso l’RP.
 	- I pacchetti della sorgente vengono incapsulati e inviati al RP, che li distribuisce lungo l’albero.
 
@@ -367,8 +374,7 @@ Possibile ottimizzazione: costruire un albero specifico per la sorgente (source-
 
 Poiché pochi router supportano il multicast, storicamente si sono usati tunnel unicast tra router multicast-aware per attraversare zone non multicast.
 
-Questa dorsale logica è chiamata **MBONE**.
-
+Questa dorsale logica è chiamata _MBONE_.
 - I pacchetti multicast vengono incapsulati in pacchetti unicast.
 - Oggi MBONE è obsoleto e destinato a essere sostituito da IPv6 con PIMv6.
 - Multicast rimane usato soprattutto in reti locali o domini gestiti (es. IPTV, reti aziendali, hotel, ospedali).
