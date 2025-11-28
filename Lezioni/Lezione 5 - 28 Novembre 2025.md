@@ -1,6 +1,6 @@
 ## Routing
 
-_Instradamento (routing) e inoltro (forwarding)_ operano su due piani distinti.
+_Instradamento (routing)_ e _inoltro (forwarding)_ operano su due piani distinti.
 
 **Forwarding (data plane)**
 
@@ -50,8 +50,8 @@ Esempio: RIP.
 - Vulnerabile al *count to infinity*: rotte che si aggiornano erroneamente e fanno crescere i costi senza fine.
 - Soluzioni parziali:
 	- infinito finito (es. 16 in RIP)
-	- split horizon
-	- split horizon with poison reverse
+	- split horizon[^1]
+	- split horizon with poison reverse[^2]
 - Adatto solo per reti piccole.
 
 #### 2) Link State
@@ -89,7 +89,7 @@ _RIP_ (_routing information protocol_) limita l’infinito a 16.
 
 Ogni router:
 1. Misura i costi verso i vicini.
-2. Crea un LSP.
+2. Crea un LSP[^3].
 3. Inonda l’AS con il suo LSP tramite flooding affidabile.
 4. Mantiene per ogni router solo l’LSP più recente.
 5. Esegue Dijkstra per ricostruire la tabella di routing.
@@ -125,7 +125,7 @@ Un AS è una sottorete di Internet composta da router e reti locali.
 
 Gli AS dei provider possono contenere a loro volta le reti dei clienti.
 
-Il GARR è un esempio di AS backbone nazionale dedicato a ricerca e istruzione, con PoP distribuiti sul territorio e collegamenti verso reti internazionali (GÉANT, NaMeX, Cogent).
+Il GARR è un esempio di AS backbone nazionale dedicato a ricerca e istruzione, con PoP[^4] distribuiti sul territorio e collegamenti verso reti internazionali (GÉANT, NaMeX, Cogent).
 
 La topologia reale può contenere decine di router per singolo PoP e migliaia di host.
 
@@ -153,9 +153,40 @@ Con la crescita di Internet si è passati a una topologia a grafo, con molti pro
 
 ### Tipologie di AS
 
-- **AS stub**: una sola connessione verso un altro AS; trasporta solo traffico locale.
-- **AS multi-homed**: più connessioni, ma non trasporta traffico di transito.
-- **AS transit**: più connessioni e trasporto di traffico locale e di transito (tipici backbone provider).
+**AS stub**
+
+- Connesso a _un solo AS esterno_.
+- Usa quel provider per tutto il traffico in uscita e riceve traffico solo per le proprie reti.
+- _Non_ fornisce transito.
+- Esempio tipico: una piccola azienda che ha un unico ISP.
+
+**AS multi-homed**
+
+- Connesso a _due o più AS esterni_, ma con politiche BGP che _rifiutano di instradare traffico tra quei provider_.
+- Usa più collegamenti esterni per ridondanza o bilanciamento.
+- _Non_ diventa un AS di transito perché non permette a un provider di raggiungere l’altro attraverso di sé.
+- Esempio: un’azienda di medie dimensioni con due ISP per affidabilità, ma che non vuole trasportare traffico tra loro.
+
+**AS transit**
+
+- Connesso a _molti AS esterni_ e _accetta di instradare traffico che non ha origine né destinazione interna_.
+- Fornisce un servizio di _transito IP_, tipico dei carrier e backbone provider globali.
+- È parte della “core” di Internet perché permette ad AS altrimenti separati di comunicare.    
+
+
+> [!importart]
+> Un AS diventa _transit_ solo quando le sue politiche BGP _permettono transito di terzi_; non basta avere molte connessioni.
+
+> [!info]
+> Non fornire transito significa che non instrada traffico tra due AS esterni diversi attraverso di sé.
+> 
+> Nel dettaglio:
+> - Un AS stub o multi-homed instrada solo:
+>	- traffico in entrata verso le proprie reti;
+>	- traffico in uscita dalle proprie reti;
+>	- traffico interno.
+> - Non instrada invece traffico del tipo:
+>	- un pacchetto che arriva da AS X e deve andare verso AS Y. 
 
 ### Ruolo di BGP
 
@@ -200,12 +231,11 @@ Un router BGP scarta un percorso se:
 
 BGP è un protocollo _a vettore di percorso_: non è distance vector e non è link state.
 
-### Esempio di propagazione
-
-Un cliente P annuncia al proprio provider (AS 2) le sue reti (es. 128.96/16 e 192.4.153/24).
+> [!example]
+> Un cliente P annuncia al proprio provider (AS 2) le sue reti (es. 128.96/16 e 192.4.153/24).
 Il provider le aggiunge alla sua tabella e le inoltra alla backbone, aggiungendo il proprio AS alla lista.
-
-Gli altri provider decidono se accettare o filtrare i percorsi in base alle politiche interne.
+> 
+> Gli altri provider decidono se accettare o filtrare i percorsi in base alle politiche interne.
 
 ### Problemi e requisiti di BGP
 
@@ -378,3 +408,11 @@ Questa dorsale logica è chiamata _MBONE_.
 - I pacchetti multicast vengono incapsulati in pacchetti unicast.
 - Oggi MBONE è obsoleto e destinato a essere sostituito da IPv6 con PIMv6.
 - Multicast rimane usato soprattutto in reti locali o domini gestiti (es. IPTV, reti aziendali, hotel, ospedali).
+
+[^1]: Un router che impara una rotta da un’interfaccia **non la reinvia sulla stessa interfaccia**.
+
+[^2]: Come split horizon con l'aggiunta che il router **annuncia la rotta sull’interfaccia da cui l’ha appresa**, però la dichiara con **costo infinito**.
+
+[^3]: È il messaggio con cui ogni router **annuncia lo stato dei propri link** (vicini, metriche, costi).
+
+[^4]: Point of Presence.
