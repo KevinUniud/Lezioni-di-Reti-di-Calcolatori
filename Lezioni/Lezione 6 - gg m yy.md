@@ -135,7 +135,7 @@ Mantiene una media pesata (SRTT) e una stima della variabilità (RTTVAR).
 
 Il timeout di ritrasmissione (RTO) viene calcolato come:  
 $RTO = SRTT + 4 × RTTVAR$.
-I
+
 l timer cresce (backoff esponenziale) quando una ritrasmissione fallisce, adattandosi alla congestione e alle variazioni della rete.
 
 ### Prestazioni del TCP
@@ -301,8 +301,6 @@ L'evitamento della congestione cerca invece di anticipare il problema e rallenta
 > Probabilità totale: $1 × 0.9 × 0.6 = 0.54\ (54\%)$.
 
 ### Evitare le congestioni basate sulle sorgenti
-
-**Evitamento della congestione basato sulla sorgente**
 
 - L'host osserva variazioni dell'RTT come segnale precoce di accumulo nelle code dei router.
 - Se l'RTT cresce oltre un intervallo considerato normale, la sorgente riduce la propria finestra di congestione (ad esempio moltiplicandola per 0,875).
